@@ -90,7 +90,7 @@ class Box:
                A Box path str.
 
         `Returns`:
-            (str, str, str): The item parent, item name, and item id for the path.
+            tuple[str, str, str]: The item parent, item name, and item id for the path.
 
         """
         new_path = self.__replace_backslashes(path)
