@@ -365,15 +365,20 @@ def test_box_download_file_with_local_path(
     assert str(downloaded_table) == str(small_box_table)
 
 
-@mark_live_test
-def test_box_get_table(box_client, small_box_table, temp_box_test_file):
-    local_table = box_client.get_table(temp_box_test_file)
-    assert str(local_table) == str(small_box_table)
-
-
-@mark_live_test
-def test_box_get_table_json(box_client, small_box_table, temp_box_test_file_json):
-    local_table = box_client.get_table(temp_box_test_file_json, format="json")
+@pytest.mark.parametrize(
+    "table_format",
+    [
+        pytest.param("csv", marks=mark_live_test),
+        pytest.param("json", marks=mark_live_test),
+    ],
+)
+def test_box_get_table(table_format, box_client, rand_str, small_box_table, temp_box_test_folder):
+    test_file_name = temp_box_test_folder + "/" + rand_str()
+    test_file_id = box_client.upload_table(
+        small_box_table, path=test_file_name, format=table_format
+    )
+    local_table = box_client.get_table(test_file_name, format=table_format)
+    box_client.delete_file_by_id(test_file_id)
     assert str(local_table) == str(small_box_table)
 
 

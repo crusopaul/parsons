@@ -59,4 +59,3 @@ def temp_box_test_file(request, box_client, rand_str, small_box_table, temp_box_
     temp_file_id = box_client.upload_table(small_box_table, temp_file, format=table_format)
     yield temp_file
     box_client.delete_file_by_id(temp_file_id)
-

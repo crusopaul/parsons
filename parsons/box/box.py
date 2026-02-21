@@ -54,6 +54,7 @@ class Box:
     calls. This can be slow for long paths or intermediate folders
     that contain many items. If performance is an issue, please use the
     corresponding folder_id/file_id methods for each function.
+
     """
 
     # In what formats can we upload/save Tables to Box? For now csv and JSON.
@@ -73,6 +74,7 @@ class Box:
 
         `Returns`:
             str: A string for a Box path str with back slashes replaced by forward slashes.
+
         """
         if path is not None and "\\" in path:
             new_path = path.replace("\\", "/")
@@ -89,6 +91,7 @@ class Box:
 
         `Returns`:
             (str, str, str): The item parent, item name, and item id for the path.
+
         """
         new_path = self.__replace_backslashes(path)
 
@@ -115,6 +118,7 @@ class Box:
 
         `Returns`:
             str: The Box id of the newly-created folder.
+
         """
         folder_parent_name, folder_name, folder_id = self.__getPathFromString(path)
         return self.create_folder_by_id(folder_name, parent_folder_id=folder_id)
@@ -133,6 +137,7 @@ class Box:
 
         `Returns`:
             str: The Box id of the newly-created folder.
+
         """
         parent = CreateFolderParent(id=parent_folder_id)
         subfolder = self.client.folders.create_folder(name=folder_name, parent=parent)
@@ -145,6 +150,7 @@ class Box:
             folder_id: str
                Box path str to the folder to delete. Any back slashes will be treated
                as forward slashes.
+
         """
         new_path = self.__replace_backslashes(path)
         folder_id = self.get_item_id(new_path)
@@ -156,6 +162,7 @@ class Box:
         `Args`:
             folder_id: str
                The Box id of the folder to delete.
+
         """
         self.client.folders.delete_folder_by_id(folder_id=folder_id, recursive=True)
 
@@ -166,6 +173,7 @@ class Box:
             path: str
               Box path str to the file to delete. Any back slashes will be treated as
               forward slashes.
+
         """
         file_id = self.get_item_id(path)
         self.delete_file_by_id(file_id=file_id)
@@ -176,6 +184,7 @@ class Box:
         `Args`:
             file_id: str
               The Box id of the file to delete.
+
         """
         self.client.files.delete_file_by_id(file_id=file_id)
 
@@ -195,6 +204,7 @@ class Box:
 
         `Returns`: Table
             A Parsons table of items in the folder and their attributes.
+
         """
         folder_id = DEFAULT_FOLDER_ID if path is None else self.get_item_id(path)
         return self.list_items_by_id(folder_id=folder_id, item_type=item_type)
@@ -213,6 +223,7 @@ class Box:
 
         `Returns`: Table
             A Parsons table of items in the folder and their attributes.
+
         """
         folder_items = self.client.folders.get_folder_items(folder_id)
         if item_type is not None:
@@ -231,6 +242,7 @@ class Box:
                search in the default folder.
         `Returns`: Table
             A Parsons table of files and their attributes.
+
         """
         return self.list_items_by_id(folder_id=folder_id, item_type="file")
 
@@ -243,6 +255,7 @@ class Box:
                search in the default folder.
         `Returns`: Table
             A Parsons table of folders and their attributes.
+
         """
         return self.list_items_by_id(folder_id=folder_id, item_type="folder")
 
@@ -260,6 +273,7 @@ class Box:
 
         `Returns`: str
             The uploaded Box File object's id.
+
         """
         folder_parent_name, table_name, folder_id = self.__getPathFromString(path)
         return self.upload_table_to_folder_id(
@@ -287,6 +301,7 @@ class Box:
 
         `Returns`: str
             The uploaded Box File object's id.
+
         """
         if format not in self.ALLOWED_FILE_FORMATS:
             raise ValueError(
@@ -324,6 +339,7 @@ class Box:
 
         `Returns`: str
             The uploaded Box File object's id.
+
         """
         if path is not None:
             _, file_name, folder_id = self.__getPathFromString(path)
@@ -347,6 +363,7 @@ class Box:
 
         `Returns`: str
             The uploaded Box File object's id.
+
         """
         use_file_name = file.name if file_name is None else file_name
 
@@ -394,6 +411,7 @@ class Box:
         `Returns:`
             Path
                 The Path of the new file
+
         """
 
         # Temp file will be around as long as enclosing process is running,
@@ -420,6 +438,7 @@ class Box:
 
         `Returns`: Table
             A Parsons Table.
+
         """
         file_id = self.get_item_id(path)
         return self.get_table_by_file_id(file_id=file_id, format=format)
@@ -435,6 +454,7 @@ class Box:
 
         `Returns`: Table
             A Parsons Table.
+
         """
         if format not in self.ALLOWED_FILE_FORMATS:
             raise ValueError(
