@@ -22,7 +22,7 @@ This class requires credentials in the form of a string to be either passed into
   # Note: these are fake keys, provided as examples.
   export BOX_ACCESS_TOKEN=7B39m3ozIGyTcazbWRbi5F2SSZ5J
 
-*NOTE*: Most functions in this class exist both in 'path'-based form and 'folder_id'/'file_id'-based form. The path-based forms rely on the `get_item_id()` method, which navigates through subfolders with sequential API calls. This can be slow and computationally expensive if the Box path string in question is long, or intermediate folders contain many items. If efficiency is paramount, consider using the "by_id" methods of each function.
+*NOTE*: Most functions in this class exist both in 'path'-based form and 'folder_id'/'file_id'-based form. The path-based forms rely on the `get_item_id()` method, which navigates through subfolders with sequential API calls. This can be slow and computationally expensive if the Box path string in question is long, or intermediate folders contain many items. If efficiency and memory management is paramount, consider using the "by_id" methods of each function. In most cases, the id will be more accessible from returns on upload methods despite this documentation describing both methods.
 
 **Instantiate class**
 
@@ -30,25 +30,25 @@ This class requires credentials in the form of a string to be either passed into
 
    from parsons import Box
 
-   # First approach: Use API credentials via environmental variables
+   # First approach: Use API credentials via environmental variables.
    box = Box()
 
-   # Second approach: Pass API credentials as arguments
+   # Second approach: Pass API credentials as arguments.
    box = Box(access_token='7B39m3ozIGyTcazbWRbi5F2SSZ5J'):
 
 **Create a subfolder and upload a Parsons table to it**
 
 .. code-block:: python
 
-  # Create folder inside default folder
+  # Create folder inside default folder.
   my_folder_id = box.create_folder('My Folder')
 
-  # Create subfolder inside new folder and upload table to it
+  # Create subfolder inside new folder and upload table to it.
   box.create_folder(path='My Folder/My Subfolder')
   box_file = box.upload_table(table=my_parsons_table,
                               path='My Folder/My Subfolder/My Parsons Table')
 
-  # Create new subfolder using folder_id and upload table to it
+  # Create new subfolder using folder_id and upload table to it.
   sub_folder_id = box.create_folder_by_id(folder_name='My SubFolder',
                                           parent_folder_id=my_folder_id)
   box_file = box.upload_table_to_folder_id(table=my_parsons_table,
@@ -59,16 +59,16 @@ This class requires credentials in the form of a string to be either passed into
 
 .. code-block:: python
 
-  # List default folder
+  # List default folder.
   default_folder_list = box.list()
 
-  # Subfolder list - by Box path str
+  # Subfolder list - by Box path str.
   subfolder_list = box.list('My Folder/My Subfolder')
 
   subfolder_file_list = box.list(path='My Folder/My Subfolder',
                                  item_type='file')
 
-  # Subfolder list - by id
+  # Subfolder list - by id.
   subfolder_file_list = box.list_files_by_id(folder_id='533944')
   subfolder_folder_list = box.list_folders_by_id(folder_id='533944')
   all_items = box.list_items_by_id(folder_id='533944')
@@ -77,10 +77,10 @@ This class requires credentials in the form of a string to be either passed into
 
 .. code-block:: python
 
-  # Download a table
+  # Download a table.
   downloaded_table = box.get_table(path='My Folder/My Subfolder/My Parsons Table')
 
-  # Download a table using file id
+  # Download a table using file id.
   downloaded_table = box.get_table_by_file_id(file_id=box_file_id)
 
 **Get an item id from a Box path str**
@@ -93,9 +93,9 @@ This class requires credentials in the form of a string to be either passed into
 
 .. code-block:: python
 
-  # Delete a file
+  # Delete a file.
   box.delete_file(path='My Folder/My Subfolder/My Parsons Table')
-  # Delete a file by id
+  # Delete a file by id.
   box.delete_file_by_id(file_id=file_id)
 
   box.delete_folder(path='My Folder/My Subfolder')

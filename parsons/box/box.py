@@ -410,7 +410,7 @@ class Box:
 
         `Returns:`
             Path
-                The Path of the new file
+                The Path of the new file.
 
         """
 
