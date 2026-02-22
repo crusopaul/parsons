@@ -1,4 +1,5 @@
 import logging
+from collections.abc import Callable
 from typing import Any, Literal, Self
 
 import petl
@@ -140,15 +141,16 @@ class ETL:
         self.table = petl.rename(self.table, column_map)
         return self
 
-    def fill_column(self, column_name: str, fill_value: Any = None) -> Self:
+    def fill_column(self, column_name: str, fill_value: Callable[Any, Any] | Any = None) -> Self:
         """
         Fill a column in a table.
 
         `Args:`
             column_name: str
                 The column to fill.
-            fill_value: Any
-                A fixed or calculated value.
+            fill_value: Callable[Any, Any] | Any
+                A conversion function taking a single argument and returning the converted
+                value. Alternatively, a fixed or calculated value (or None).
         `Returns:`
             ETL: The modified ETL (self).
 
@@ -163,17 +165,18 @@ class ETL:
 
         return self
 
-    def fillna_column(self, column_name, fill_value):
+    def fillna_column(self, column_name: str, fill_value: Callable[Any, Any] | Any) -> Self:
         """
         Fill None values in a column in a table.
 
         `Args:`
             column_name: str
                 The column to fill.
-            fill_value:
-                A fixed or calculated value.
+            fill_value: Callable[Any, Any] | Any
+                A conversion function taking a single argument and returning the converted
+                value. Alternatively, a fixed or calculated value.
         `Returns:`
-            `Parsons Table` and also updates self.
+            ETL: The modified ETL (self).
 
         """
 
@@ -195,25 +198,24 @@ class ETL:
 
         return self
 
-    def move_column(self, column, index):
+    def move_column(self, column: str, index: int) -> Self:
         """
         Move a column.
 
         `Args:`
             column: str
                 The column name to move.
-            index:
+            index: int
                 The new index for the column.
         `Returns:`
-            `Parsons Table` and also updates existing object.
+            ETL: The modified ETL (self).
 
         """
 
         self.table = petl.movefield(self.table, column, index)
-
         return self
 
-    def convert_column(self, *column, **kwargs):
+    def convert_column(self, *column: str, **kwargs: Callable[Any, Any] | Any) -> Self:
         """
         Transform values under one or more fields via arbitrary functions, method
         invocations or dictionary translations. This leverages the petl ``convert()``
@@ -222,18 +224,17 @@ class ETL:
         `Args:`
             *column: str
                 A single column or multiple columns passed as a list.
-            **kwargs: str, method or variable
+            **kwargs: Callable[Any, Any] | Any
                 The update function, method, or variable to process the update.
         `Returns:`
-            `Parsons Table` and also updates self.
+            ETL: The modified ETL (self).
 
         """
 
         self.table = petl.convert(self.table, *column, **kwargs)
-
         return self
 
-    def get_column_max_width(self, column):
+    def get_column_max_width(self, column: str) -> int:
         """
         Return the maximum width of the column.
 
@@ -241,7 +242,7 @@ class ETL:
             column: str
                 The column name.
         `Returns:`
-            int.
+            int: The max width.
 
         """
 
@@ -253,13 +254,13 @@ class ETL:
 
         return max_width
 
-    def convert_columns_to_str(self):
+    def convert_columns_to_str(self) -> Self:
         """
         Convenience function to convert all non-string or mixed columns in a
         Parsons table to string (e.g. for comparison.)
 
         `Returns:`
-            `Parsons Table` and also updates self.
+            ETL: The modified ETL (self).
 
         """
 
@@ -282,7 +283,9 @@ class ETL:
 
         return self
 
-    def coalesce_columns(self, dest_column, source_columns, remove_source_columns=True):
+    def coalesce_columns(
+        self, dest_column: str, source_columns: list, remove_source_columns: bool = True
+    ) -> Self:
         """
         Coalesces values from one or more source columns into a destination column, by selecting
         the first non-empty value. If the destination column doesn't exist, it will be added.
@@ -293,10 +296,11 @@ class ETL:
             source_columns: list
                 List of source column names.
             remove_source_columns: bool
-                Whether to remove the source columns after the coalesce. If the destination
-                column is also one of the source columns, it will not be removed.
+                Optionally, whether to remove the source columns after the coalesce. If the
+                destination column is also one of the source columns, it will not be removed.
+                Defaults to True.
         `Returns:`
-            `Parsons Table` and also updates self.
+            ETL: The modified ETL (self).
 
         """
 
@@ -327,7 +331,7 @@ class ETL:
 
         return self
 
-    def map_columns(self, column_map, exact_match=True):
+    def map_columns(self, column_map: dict, exact_match: bool = True) -> Self:
         """
         Standardizes column names based on multiple possible values. This method
         is helpful when your input table might have multiple and unknown column
@@ -336,11 +340,11 @@ class ETL:
         `Args:`
             column_map: dict
                 A dictionary of columns and possible values that map to it.
-            exact_match: boolean
-                If ``True`` will only map if an exact match. If ``False`` will
-                ignore case, spaces and underscores.
+            exact_match: bool
+                Optionally, if ``True`` will only map if an exact match. If ``False`` will
+                ignore case, spaces and underscores. Defaults to True.
         `Returns:`
-            `Parsons Table` and also updates self.
+            ETL: The modified ETL (self).
 
         .. code-block:: python
 
@@ -367,7 +371,7 @@ class ETL:
 
         return self
 
-    def map_and_coalesce_columns(self, column_map):
+    def map_and_coalesce_columns(self, column_map: dict) -> Self:
         """
         Coalesces columns based on multiple possible values. The columns in the map
         do not need to be in your table, so you can create a map with all possibilities.
@@ -381,7 +385,7 @@ class ETL:
                 A dictionary of columns and possible values that map to it.
 
         `Returns:`
-            `Parsons Table` and also updates self.
+            ETL: The modified ETL (self).
 
         .. code-block:: python
 
@@ -419,7 +423,7 @@ class ETL:
 
         return self
 
-    def get_column_types(self, column):
+    def get_column_types(self, column: str) -> list:
         """
         Return all of the Python types for values in a given column.
 
@@ -427,29 +431,24 @@ class ETL:
             column: str
                 Name of the column to analyze.
         `Returns:`
-            list
-                A list of Python types.
+            list: A list of Python types.
 
         """
 
         return list(petl.typeset(self.table, column))
 
-    def get_columns_type_stats(self):
+    def get_columns_type_stats(self) -> list:
         """
         Return descriptive stats for all columns.
 
         `Returns:`
-            list
-                A list of dicts.
-        `Returns:`
-            list
-                A list of dicts, each containing a column 'name' and a 'type' list.
+            list: A list of dicts, each containing a column 'name' and a 'type' list.
 
         """
 
         return [{"name": col, "type": self.get_column_types(col)} for col in self.table.columns()]
 
-    def convert_table(self, *args):
+    def convert_table(self, *args: Callable[Any, Any] | Any) -> Self:
         r"""
         Transform all cells in a table via arbitrary functions, method invocations or dictionary
         translations. This method is useful for cleaning fields and data hygiene functions such
@@ -457,7 +456,7 @@ class ETL:
         found `here` <https://petl.readthedocs.io/en/v0.24/transform.html#petl.convert>`_.
 
         `Args:`
-            *args: str, method or variable
+            *args: Callable[Any, Any]
                 The update function, method, or variable to process the update. Can also...
         `Returns:`
             `Parsons Table` and also updates self.
@@ -465,7 +464,6 @@ class ETL:
         """
 
         self.convert_column(self.columns, *args)
-
         return self
 
     def unpack_dict(
