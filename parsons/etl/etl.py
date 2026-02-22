@@ -44,7 +44,7 @@ class ETL:
         self,
         column: str,
         value: Any = None,
-        index: int = None,
+        index: int | None = None,
         if_exists: Literal["fail", "replace"] = "fail",
     ) -> Self:
         """
