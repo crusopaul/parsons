@@ -41,12 +41,6 @@ class Box:
     """Box is a file storage provider.
 
     Args:
-        client_id: str
-            Box client (account) id -- probably a 16-char alphanumeric.
-            Not required if ``BOX_CLIENT_ID`` env variable is set.
-        client_secret: str
-            Box private key -- probably a 32-char alphanumeric.
-            Not required if ``BOX_CLIENT_SECRET`` env variable is set.
         access_token: str
             Box developer access token -- probably a 32-char alphanumeric.
             Note that this is only valid for developer use only, and should not
@@ -249,9 +243,8 @@ class Box:
                search in the default folder.
 
         Returns: Table
-            A Parsons table of files and their attributes.
-               The Box id of the folder in which to search.
-                If omitted, search in the default folder.
+            A Parsons table of files and their attributes. The Box id of the folder in
+            which to search. If omitted, search in the default folder.
 
         """
         return self.list_items_by_id(folder_id=folder_id, item_type="file")
@@ -306,7 +299,8 @@ class Box:
             file_name: str
                The filename under which it should be saved in Box.
             folder_id: str
-               Optionally, the id of the subfolder in which it should be saved.
+               Optionally, the id of the subfolder in which it should be saved. If
+               omitted, the default folder will be used.
             format: str
                For now, only 'csv' and 'json'; format in which to save table. Defaults to 'csv'.
 
@@ -346,7 +340,8 @@ class Box:
                The local file to be saved to Box.
             path: str
                Optionally, Box path str where table should be saved. Any back
-               slashes will be treated as forward slashes.
+               slashes will be treated as forward slashes. Defaults to default folder with
+               a name matching the file name.
 
         Returns: str
             The uploaded Box File object's id.
@@ -368,7 +363,8 @@ class Box:
             file: Path
                The local file to be saved to Box.
             file_name: str
-               Optionally, the filename under which it should be saved in Box.
+               Optionally, the filename under which it should be saved in Box. Defaults to
+               the file name.
             folder_id: str
                Optionally, the id of the subfolder in which it should be saved.
 
@@ -460,7 +456,8 @@ class Box:
             file_id: str
                 The Box file_id of the table to be retrieved.
             format: str
-                 Format in which Table has been saved; for now, only 'csv' or 'json'.
+                Format in which Table has been saved; for now, only 'csv' or 'json'.
+                Defaults to 'csv'.
 
         Returns: Table
             A Parsons Table.
@@ -502,8 +499,8 @@ class Box:
                 folder in question. Any back slashes will be treated as forward
                 slashes.
             base_folder_id: str
-                 What to use as the base folder for the path. By default, use
-                 the default folder.
+                What to use as the base folder for the path. If omitted, the default
+                folder will be used.
 
         Returns: str
             A Box File object's id.
