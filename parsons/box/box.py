@@ -40,13 +40,20 @@ DEFAULT_FOLDER_ID = "0"
 class Box:
     """Box is a file storage provider.
 
-    `Args:`
+    Args:
+        client_id: str
+            Box client (account) id -- probably a 16-char alphanumeric.
+            Not required if ``BOX_CLIENT_ID`` env variable is set.
+        client_secret: str
+            Box private key -- probably a 32-char alphanumeric.
+            Not required if ``BOX_CLIENT_SECRET`` env variable is set.
         access_token: str
             Box developer access token -- probably a 32-char alphanumeric.
             Note that this is only valid for developer use only, and should not
             be used when creating and maintaining access for typical users.
             Not required if ''BOX_ACCESS_TOKEN'' env variable is set.
-    `Returns:`
+
+    Returns:
             Box class
 
     *NOTE*: All path-based methods in this class use an intermediate
@@ -68,11 +75,11 @@ class Box:
     def __replace_backslashes(self, path: str) -> str:
         """Replace the back slashes in a string with forward slashes.
 
-        `Args`:
+        Args:
             path: str
                Box path str that may need slashes replaced.
 
-        `Returns`:
+        Returns:
             str: A string for a Box path str with back slashes replaced by forward slashes.
 
         """
@@ -85,11 +92,11 @@ class Box:
     def __getPathFromString(self, path: str) -> (str, str, str):
         """Parse a file name out from a string representing a Box path.
 
-        `Args`:
+        Args:
             path: str
                A Box path str.
 
-        `Returns`:
+        Returns:
             tuple[str, str, str]: The item parent, item name, and item id for the path.
 
         """
@@ -110,13 +117,13 @@ class Box:
     def create_folder(self, path: str) -> str:
         """Create a Box folder.
 
-        `Args`:
+        Args:
             path: str
                Box path str to the folder to be created. If no slashes are present,
                path will be name of folder created in the default folder. Any
                back slashes will be treated as forward slashes.
 
-        `Returns`:
+        Returns:
             str: The Box id of the newly-created folder.
 
         """
@@ -128,14 +135,14 @@ class Box:
     ) -> str:
         """Create a Box folder.
 
-        `Args`:
+        Args:
             folder_name: str
                The name to give to the new folder.
             parent_folder_id: str
                Folder id of the parent folder in which to create the new folder. If
                omitted, the default folder will be used.
 
-        `Returns`:
+        Returns:
             str: The Box id of the newly-created folder.
 
         """
@@ -146,8 +153,8 @@ class Box:
     def delete_folder(self, path: str) -> None:
         """Delete a Box folder.
 
-        `Args`:
-            folder_id: str
+        Args:
+            folder_id: st
                Box path str to the folder to delete. Any back slashes will be treated
                as forward slashes.
 
@@ -159,7 +166,7 @@ class Box:
     def delete_folder_by_id(self, folder_id: str) -> None:
         """Delete a Box folder.
 
-        `Args`:
+        Args:
             folder_id: str
                The Box id of the folder to delete.
 
@@ -169,7 +176,7 @@ class Box:
     def delete_file(self, path: str) -> None:
         """Delete a Box file.
 
-        `Args`:
+        Args:
             path: str
               Box path str to the file to delete. Any back slashes will be treated as
               forward slashes.
@@ -181,7 +188,7 @@ class Box:
     def delete_file_by_id(self, file_id: str) -> None:
         """Delete a Box file.
 
-        `Args`:
+        Args:
             file_id: str
               The Box id of the file to delete.
 
@@ -193,7 +200,7 @@ class Box:
     ) -> Table:
         """Return a Table of Box files and/or folders found at a path.
 
-        `Args`:
+        Args:
             path:str
                If specified, Box path str of the folder to be listed.
                If omitted, the default folder will be used.
@@ -202,7 +209,7 @@ class Box:
                `file` or `folder`. If omitted, all items will be returned. Any back
                slashes will be treated as forward slashes.
 
-        `Returns`: Table
+        Returns: Table
             A Parsons table of items in the folder and their attributes.
 
         """
@@ -214,14 +221,14 @@ class Box:
     ) -> Table:
         """Return a Table of Box files and/or folders found in a folder.
 
-        `Args`:
+        Args:
             folder_id: str
               The Box id of the folder to list items for.
             item_type: str
                Optionally which type of items should be returned, typically either
                `file` or `folder`. If omitted, all items will be returned.
 
-        `Returns`: Table
+        Returns: Table
             A Parsons table of items in the folder and their attributes.
 
         """
@@ -236,12 +243,15 @@ class Box:
     def list_files_by_id(self, folder_id: str = DEFAULT_FOLDER_ID) -> Table:
         """List all Box files in a folder.
 
-        `Args`:
+        Args:
             folder_id: str
                The Box id of the folder in which to search. If omitted,
                search in the default folder.
-        `Returns`: Table
+
+        Returns: Table
             A Parsons table of files and their attributes.
+               The Box id of the folder in which to search.
+                If omitted, search in the default folder.
 
         """
         return self.list_items_by_id(folder_id=folder_id, item_type="file")
@@ -249,11 +259,12 @@ class Box:
     def list_folders_by_id(self, folder_id: str = DEFAULT_FOLDER_ID) -> Table:
         """List all Box folders.
 
-        `Args`:
+        Args:
             folder_id: str
                The Box id of the folder in which to search. If omitted,
                search in the default folder.
-        `Returns`: Table
+
+        Returns: Table
             A Parsons table of folders and their attributes.
 
         """
@@ -262,7 +273,7 @@ class Box:
     def upload_table(self, table: Table, path: str, format: Literal["csv", "json"] = "csv") -> str:
         """Save the passed table to Box.
 
-        `Args`:
+        Args:
             table:Table
                The Parsons table to be saved.
             path: str
@@ -271,7 +282,7 @@ class Box:
             format: str
                For now, only 'csv' and 'json'; format in which to save table. Defaults to 'csv'.
 
-        `Returns`: str
+        Returns: str
             The uploaded Box File object's id.
 
         """
@@ -289,7 +300,7 @@ class Box:
     ) -> str:
         """Save the passed table to Box.
 
-        `Args`:
+        Args:
             table:Table
                The Parsons table to be saved.
             file_name: str
@@ -299,7 +310,7 @@ class Box:
             format: str
                For now, only 'csv' and 'json'; format in which to save table. Defaults to 'csv'.
 
-        `Returns`: str
+        Returns: str
             The uploaded Box File object's id.
 
         """
@@ -330,14 +341,14 @@ class Box:
     def upload_file(self, file: Path, path: str | None = None) -> str:
         """Save the passed file to Box.
 
-        `Args`:
+        Args:
             file: Path
                The local file to be saved to Box.
             path: str
                Optionally, Box path str where table should be saved. Any back
                slashes will be treated as forward slashes.
 
-        `Returns`: str
+        Returns: str
             The uploaded Box File object's id.
 
         """
@@ -353,7 +364,7 @@ class Box:
     ) -> str:
         """Save the passed file to Box.
 
-        `Args`:
+        Args:
             file: Path
                The local file to be saved to Box.
             file_name: str
@@ -361,7 +372,7 @@ class Box:
             folder_id: str
                Optionally, the id of the subfolder in which it should be saved.
 
-        `Returns`: str
+        Returns: str
             The uploaded Box File object's id.
 
         """
@@ -398,7 +409,7 @@ class Box:
     def download_file(self, path: str, local_path: Path | None = None) -> Path:
         """Download a Box object to a local file.
 
-        `Args`:
+        Args:
             path: str
                 The Box path str. Any back slashes will be
                 treated as forward slashes.
@@ -408,7 +419,7 @@ class Box:
                 that file will be removed automatically when the script is done
                 running.
 
-        `Returns:`
+        Returns:
             Path
                 The Path of the new file.
 
@@ -429,14 +440,14 @@ class Box:
     def get_table(self, path: str, format: Literal["csv", "json"] = "csv") -> Table:
         """Get a table that has been saved to Box in csv or JSON format.
 
-        `Args`:
+        Args:
             path: str
                 The slash-separated Box path str to the file containing the table. Any back
                 slashes will be treated as forward slashes.
             format: str
                  Format in which Table has been saved; for now, only 'csv' or 'json'. Defaults to 'csv'.
 
-        `Returns`: Table
+        Returns: Table
             A Parsons Table.
 
         """
@@ -446,13 +457,13 @@ class Box:
     def get_table_by_file_id(self, file_id: str, format: Literal["csv", "json"] = "csv") -> Table:
         """Get a table that has been saved to Box in csv or JSON format.
 
-        `Args`:
+        Args:
             file_id: str
                 The Box file_id of the table to be retrieved.
             format: str
                  Format in which Table has been saved; for now, only 'csv' or 'json'.
 
-        `Returns`: Table
+        Returns: Table
             A Parsons Table.
 
         """
@@ -486,7 +497,7 @@ class Box:
         `path`, so can be slow for long paths or intermediate folders
         containing very many items.
 
-        `Args`:
+        Args:
             path: str
                 A slash-separated Box path str from the base folder to the file or
                 folder in question. Any back slashes will be treated as forward
@@ -495,7 +506,7 @@ class Box:
                  What to use as the base folder for the path. By default, use
                  the default folder.
 
-        `Returns`: str
+        Returns: str
             A Box File object's id.
 
         """
