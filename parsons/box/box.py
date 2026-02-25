@@ -154,7 +154,7 @@ class Box:
         """Delete a Box folder.
 
         Args:
-            folder_id: st
+            folder_id: str
                Box path str to the folder to delete. Any back slashes will be treated
                as forward slashes.
 
