@@ -53,8 +53,8 @@ class Box:
             be used when creating and maintaining access for typical users.
             Not required if ''BOX_ACCESS_TOKEN'' env variable is set.
 
-    Returns:
-            Box class
+    Returns: Box
+        Box class.
 
     *NOTE*: All path-based methods in this class use an intermediate
     method that looks up the relevant folder/file id by successive API
@@ -79,8 +79,8 @@ class Box:
             path: str
                Box path str that may need slashes replaced.
 
-        Returns:
-            str: A string for a Box path str with back slashes replaced by forward slashes.
+        Returns: str
+            A string for a Box path str with back slashes replaced by forward slashes.
 
         """
         if path is not None and "\\" in path:
@@ -96,8 +96,8 @@ class Box:
             path: str
                A Box path str.
 
-        Returns:
-            tuple[str, str, str]: The item parent, item name, and item id for the path.
+        Returns: tuple[str, str, str]
+            The item parent, item name, and item id for the path.
 
         """
         new_path = self.__replace_backslashes(path)
@@ -123,8 +123,8 @@ class Box:
                path will be name of folder created in the default folder. Any
                back slashes will be treated as forward slashes.
 
-        Returns:
-            str: The Box id of the newly-created folder.
+        Returns: str
+            The Box id of the newly-created folder.
 
         """
         folder_parent_name, folder_name, folder_id = self.__getPathFromString(path)
@@ -142,8 +142,8 @@ class Box:
                Folder id of the parent folder in which to create the new folder. If
                omitted, the default folder will be used.
 
-        Returns:
-            str: The Box id of the newly-created folder.
+        Returns: str
+            The Box id of the newly-created folder.
 
         """
         parent = CreateFolderParent(id=parent_folder_id)
@@ -201,7 +201,7 @@ class Box:
         """Return a Table of Box files and/or folders found at a path.
 
         Args:
-            path:str
+            path: str
                If specified, Box path str of the folder to be listed.
                If omitted, the default folder will be used.
             item_type: str
@@ -274,7 +274,7 @@ class Box:
         """Save the passed table to Box.
 
         Args:
-            table:Table
+            table: Table
                The Parsons table to be saved.
             path: str
                Box path str where table should be saved. Any back
@@ -301,7 +301,7 @@ class Box:
         """Save the passed table to Box.
 
         Args:
-            table:Table
+            table: Table
                The Parsons table to be saved.
             file_name: str
                The filename under which it should be saved in Box.
@@ -419,9 +419,8 @@ class Box:
                 that file will be removed automatically when the script is done
                 running.
 
-        Returns:
-            Path
-                The Path of the new file.
+        Returns: Path
+            The Path of the new file.
 
         """
 
