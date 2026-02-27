@@ -47,18 +47,18 @@ This class requires credentials in the form of Box Authentication passed to the 
 .. code-block:: python
 
   # Create folder inside default folder.
-  my_folder_id = box.create_folder('My Folder')
+  my_folder_id = box.create_folder("My Folder")
 
   # Create subfolder inside new folder and upload table to it.
-  box.create_folder(path='My Folder/My Subfolder')
+  box.create_folder(path="My Folder/My Subfolder")
   box_file = box.upload_table(table=my_parsons_table,
-                              path='My Folder/My Subfolder/My Parsons Table')
+                              path="My Folder/My Subfolder/My Parsons Table")
 
   # Create new subfolder using folder_id and upload table to it.
-  sub_folder_id = box.create_folder_by_id(folder_name='My SubFolder',
+  sub_folder_id = box.create_folder_by_id(folder_name="My SubFolder",
                                           parent_folder_id=my_folder_id)
   box_file = box.upload_table_to_folder_id(table=my_parsons_table,
-                                           file_name='My Parsons Table',
+                                           file_name="My Parsons Table",
                                            folder_id=sub_folder_id)
 
 **List folders and files**
@@ -69,52 +69,69 @@ This class requires credentials in the form of Box Authentication passed to the 
   default_folder_list = box.list()
 
   # Subfolder list - by Box path str.
-  subfolder_list = box.list('My Folder/My Subfolder')
+  subfolder_list = box.list("My Folder/My Subfolder")
 
-  subfolder_file_list = box.list(path='My Folder/My Subfolder',
-                                 item_type='file')
+  subfolder_file_list = box.list(path="My Folder/My Subfolder",
+                                 item_type="file")
 
   # Subfolder list - by id.
-  subfolder_file_list = box.list_files_by_id(folder_id='533944')
-  subfolder_folder_list = box.list_folders_by_id(folder_id='533944')
-  all_items = box.list_items_by_id(folder_id='533944')
+  subfolder_file_list = box.list_files_by_id(folder_id="533944")
+  subfolder_folder_list = box.list_folders_by_id(folder_id="533944")
+  all_items = box.list_items_by_id(folder_id="533944")
 
 **Upload tables to Box**
 
 .. code-block:: python
 
   # Upload a table as a csv file.
-  uploaded_table = box.upload_table(my_data_table, path='My Folder/My Subfolder/My Parsons Table', format="csv")
+  uploaded_table = box.upload_table(my_data_table, path="My Folder/My Subfolder/My Parsons Table", format="csv")
 
   # Upload a table as a json file.
-  uploaded_table = box.upload_table(my_data_table, path='My Folder/My Subfolder/My Parsons Table', format="json")
+  uploaded_table = box.upload_table(my_data_table, path="My Folder/My Subfolder/My Parsons Table", format="json")
 
 **Retrieve tables from Box**
 
 .. code-block:: python
 
   # Download a table (csv).
-  downloaded_table = box.get_table(path='My Folder/My Subfolder/My Parsons Table', format="csv")
+  downloaded_table = box.get_table(path="My Folder/My Subfolder/My Parsons Table", format="csv")
 
   # Download a table (csv) using file id.
   downloaded_table = box.get_table_by_file_id(file_id=box_file_id, format="csv")
+
+**Upload files to Box**
+
+.. code-block:: python
+
+  # Upload a file to a specified location.
+  uploaded_file = box.upload_file(my_file, path="My Folder/My Subfolder/My File")
+
+**Retrieve files from Box**
+
+.. code-block:: python
+
+  # Download a file to a temporary file.
+  downloaded_file = box.download_file("My Folder/My Subfolder/My File")
+
+  # Download a file to a persistent, specified location.
+  downloaded_file = box.download_file("My Folder/My Subfolder/My File", local_path="my_file.dat")
 
 **Get an item id from a Box path str**
 
 .. code-block:: python
 
-  file_id = box.get_item_id(path='My Folder/My Subfolder/My Parsons Table')
+  file_id = box.get_item_id(path="My Folder/My Subfolder/My Parsons Table")
 
 **Delete folders/files**
 
 .. code-block:: python
 
   # Delete a file.
-  box.delete_file(path='My Folder/My Subfolder/My Parsons Table')
+  box.delete_file(path="My Folder/My Subfolder/My Parsons Table")
   # Delete a file by id.
   box.delete_file_by_id(file_id=file_id)
 
-  box.delete_folder(path='My Folder/My Subfolder')
+  box.delete_folder(path="My Folder/My Subfolder")
   box.delete_folder_by_id(folder_id=subfolder_id)
 
 ***
