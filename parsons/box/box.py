@@ -17,6 +17,7 @@ https://developer.box.com/guides/applications/platform-apps/create/
 """
 
 import logging
+import os
 import tempfile
 from pathlib import Path
 from typing import Literal
@@ -24,12 +25,12 @@ from typing import Literal
 from box_sdk_gen import BoxClient, BoxDeveloperTokenAuth
 from box_sdk_gen.managers.folders import CreateFolderParent
 from box_sdk_gen.managers.uploads import (
-    UploadFileAttributesParentField,
     UploadWithPreflightCheckAttributes,
+    UploadWithPreflightCheckAttributesParentField,
 )
+from box_sdk_gen.networking.auth import Authentication
 
 from parsons.etl.table import Table
-from parsons.utilities.check_env import check as check_env
 from parsons.utilities.files import create_temp_file, create_temp_file_for_path
 
 logger = logging.getLogger(__name__)
@@ -41,11 +42,12 @@ class Box:
     """Box is a file storage provider.
 
     Args:
-        access_token: str
-            Box developer access token -- probably a 32-char alphanumeric.
-            Note that this is only valid for developer use only, and should not
-            be used when creating and maintaining access for typical users.
-            Not required if ''BOX_ACCESS_TOKEN'' env variable is set.
+        auth: Authentication
+            Box Authentication -- usually constructed as an access token of 32
+            characters, alphanumeric. Note that this is only valid for developer
+            use only, and should not be used when creating and maintaining access
+            for typical users. If not passed, will attempt to grab an access token
+            from the environment variable named "BOX_ACCESS_TOKEN".
 
     Returns: Box
         Box class.
@@ -61,10 +63,13 @@ class Box:
     # In what formats can we upload/save Tables to Box? For now csv and JSON.
     ALLOWED_FILE_FORMATS = ["csv", "json"]
 
-    def __init__(self, access_token: str = None):
-        access_token = check_env("BOX_ACCESS_TOKEN", access_token)
-        oauth = BoxDeveloperTokenAuth(token=access_token)
-        self.client = BoxClient(auth=oauth)
+    def __init__(self, auth: Authentication | None = None) -> None:
+        if auth is None:
+            access_token = os.environ["BOX_ACCESS_TOKEN"]
+            oauth = BoxDeveloperTokenAuth(token=access_token)
+            self.client = BoxClient(auth=oauth)
+        else:
+            self.client = BoxClient(auth=auth)
 
     def __replace_backslashes(self, path: str) -> str:
         """Replace the back slashes in a string with forward slashes.
@@ -83,7 +88,7 @@ class Box:
         else:
             return path
 
-    def __getPathFromString(self, path: str) -> (str, str, str):
+    def __getPathFromString(self, path: str) -> tuple[str, str, str]:
         """Parse a file name out from a string representing a Box path.
 
         Args:
@@ -227,10 +232,14 @@ class Box:
 
         """
         folder_items = self.client.folders.get_folder_items(folder_id)
-        if item_type is not None:
-            items = Table([vars(x) for x in folder_items.entries if x.type == item_type])
-        else:
-            items = Table([vars(x) for x in folder_items.entries])
+
+        if folder_items.entries is not None:
+            if item_type is not None:
+                items = Table([vars(x) for x in folder_items.entries if x.type == item_type])
+            else:
+                items = Table([vars(x) for x in folder_items.entries])
+        else:  # pragma: no cover
+            items = Table([])
 
         return items
 
@@ -386,14 +395,18 @@ class Box:
                     parent_folder_id=folder_id,
                 )
             else:
-                file_parent = UploadFileAttributesParentField(id=folder_id)
+                file_parent = UploadWithPreflightCheckAttributesParentField(id=folder_id)
                 file_attributes = UploadWithPreflightCheckAttributes(
                     name=use_file_name, parent=file_parent, size=file_size
                 )
                 uploaded_files = self.client.uploads.upload_with_preflight_check(
                     attributes=file_attributes, file=upload_file
                 )
-                if uploaded_files.total_count > 0:
+                if (
+                    uploaded_files.total_count is not None
+                    and uploaded_files.entries is not None
+                    and uploaded_files.total_count > 0
+                ):
                     new_file = uploaded_files.entries[0]
                 else:
                     raise SystemError(
@@ -521,9 +534,13 @@ class Box:
             # current element. If we're at initial, non-recursed call, base_folder
             # will be default folder.
             item_id = None
-            for item in self.client.folders.get_folder_items(folder_id=base_folder_id).entries:
-                if item.name == this_element:
-                    item_id = item.id
+            item_type = None
+            item_results = self.list_items_by_id(folder_id=base_folder_id)
+
+            for item in item_results:
+                if item["name"] == this_element:
+                    item_id = item["id"]
+                    item_type = item["type"]
                     break
 
             if item_id is None:
@@ -535,7 +552,7 @@ class Box:
 
             # If there *are* more elements in the path, we need to check that this item is
             # in fact a folder so we can recurse and search inside it.
-            if item.type != "folder":
+            if item_type != "folder":
                 raise ValueError(f'Invalid folder "{this_element}"')
 
             return self.get_item_id(path=use_path, base_folder_id=item_id)

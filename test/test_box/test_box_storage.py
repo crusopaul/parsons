@@ -1,6 +1,7 @@
 import os
 
 import pytest
+from box_sdk_gen import BoxDeveloperTokenAuth
 from box_sdk_gen.box.errors import BoxAPIError, BoxSDKError
 
 from parsons import Box, Table
@@ -9,8 +10,12 @@ from test.conftest import mark_live_test
 """Prior to running, you should ensure that the relevant environment
 variables have been set, e.g. via
 
-# Note: these are fake keys, provided as examples.
-export BOX_ACCESS_TOKEN=boK97B39m3ozIGyTcazbWRbi5F2SSZ5J
+..code-block:: bash
+  :caption: Fake key, provided as example.
+    export BOX_ACCESS_TOKEN=boK97B39m3ozIGyTcazbWRbi5F2SSZ5J
+..code-block:: powershell
+  :caption: Fake key, provided as example.
+    [System.Environment]::SetEnvironmentVariable('BOX_ACCESS_TOKEN','boK97B39m3ozIGyTcazbWRbi5F2SSZ5J')
 """
 TEST_ACCESS_TOKEN = os.getenv("BOX_ACCESS_TOKEN")
 
@@ -198,6 +203,12 @@ def test_box_list_files(box_client, small_box_table, temp_box_test_folder) -> No
     assert "test_file_found_1" in file_dict
     assert "test_file_found_2" in file_dict
     assert "test_file_found_3" in file_dict
+
+
+@mark_live_test
+def test_box_list_files_empty_folder(box_client, small_box_table, temp_box_test_folder) -> None:
+    items = box_client.list(temp_box_test_folder)
+    assert items.num_rows == 0
 
 
 @mark_live_test
@@ -449,6 +460,7 @@ def test_box_error_nonexistent_id_create(box_client) -> None:
 
 @mark_live_test
 def test_box_error_bad_credentials(box_client) -> None:
-    box = Box(access_token="5345345345")
+    oauth = BoxDeveloperTokenAuth(token="5345345345")
+    box = Box(auth=oauth)
     with pytest.raises(BoxSDKError, match="Developer token has expired. Please provide a new one."):
         box.list_files_by_id()
