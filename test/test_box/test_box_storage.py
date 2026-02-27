@@ -459,7 +459,7 @@ def test_box_error_nonexistent_id_create(box_client) -> None:
 
 
 @mark_live_test
-def test_box_error_bad_credentials(box_client) -> None:
+def test_box_error_bad_credentials() -> None:
     oauth = BoxDeveloperTokenAuth(token="5345345345")
     box = Box(auth=oauth)
     with pytest.raises(BoxSDKError, match="Developer token has expired. Please provide a new one."):
