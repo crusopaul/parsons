@@ -29,7 +29,7 @@ EXTRA_DEPENDENCIES = {
     "alchemer": ["surveygizmo"],
     "avro": ["fastavro"],
     "azure": ["azure-storage-blob"],
-    "box": ["boxsdk >= 4"],
+    "box": ["boxsdk[jwt] >= 4"],
     "braintree": ["braintree"],
     "catalist": ["paramiko"],
     "civis": ["civis"],
